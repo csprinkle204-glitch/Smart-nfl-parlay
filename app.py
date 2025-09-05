@@ -28,8 +28,7 @@ def get_matchup_info(team1, team2):
     }
 
 def fetch_player_stats(team):
-    # Placeholder stub
-    return {"key_players": ["QB1", "WR1", "RB1"]}
+    return {"key_players": ["QB1", "WR1", "RB1"]}  # stub
 
 def fetch_odds_data(team1, team2):
     return {
@@ -59,7 +58,7 @@ def build_smart_parlay(team1, team2, leg_count):
         "summary": f"{leg_count}-leg parlay using stats, trends, and odds from {team1} vs {team2} matchup"
     }
 
-# === MAIN ENDPOINT ===
+# === MAIN GET ENDPOINT ===
 
 @app.route("/smart-parlay", methods=["GET"])
 def smart_parlay():
@@ -73,11 +72,29 @@ def smart_parlay():
     parlay = build_smart_parlay(team1, team2, leg_count)
     return jsonify(parlay)
 
+# === NEW POST ENDPOINT for OpenAI ===
+
+@app.route("/getSmartParlay", methods=["POST"])
+def get_smart_parlay():
+    data = request.get_json()
+
+    week = data.get("week")
+    season = data.get("season")
+    leg_count = int(data.get("legCount", 3))
+    risk = data.get("riskLevel", "balanced")
+    team = data.get("focusTeam", "Chiefs")
+    opponent = "Bills"  # Temporary hardcoded opponent
+
+    parlay = build_smart_parlay(team, opponent, leg_count)
+    return jsonify(parlay)
+
 # === HEALTH CHECK ===
 
 @app.route("/", methods=["GET"])
 def home():
     return "Smart NFL Parlay API is running!"
+
+# === START SERVER ===
 
 if __name__ == "__main__":
     app.run(debug=True)
